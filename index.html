@@ -21,7 +21,16 @@
     <script src="scripts/model.js"></script>
     <script src="scripts/view.js"></script>
 </head>
+
 <body>
+<script>
+    //Default to https by redirect
+    var host = "day-book.github.io";
+    if ((host == window.location.host) && (window.location.protocol != "https:")) {
+        window.location.protocol = "https";
+    }
+</script>
+
 <div class="banner">
     <span class="title"> DayBook (குறிப்பேடு) </span>
     <span class="username"> ... </span>
