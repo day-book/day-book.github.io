@@ -6,7 +6,7 @@ $.fn.explain = function(method) {
         "<div class='nub top-nub'>&nbsp;</div>" +
         "<div class='content'>" +
         "  <div class='message'></div>" +
-        "  <div class='next'>Next</div>" +
+        "  <div class='next' tabindex='1'>Next</div>" +
         "</div>"+
         "<div class='nub bottom-nub'>&nbsp;</div>";
 
@@ -20,19 +20,42 @@ $.fn.explain = function(method) {
         this.currentStep++;
         var currentStepEl = $(this.steps[this.currentStep]);
         $(".explain-container").remove();
+
+        this.handleBeforeHook(currentStepEl);
         var container = $(this.noteTemplate);
         $('body').append(container);
         this.setPosition(container, currentStepEl);
         container.find(".message").text(currentStepEl.text());
+        container.find(".next").focus();
         if(this.currentStep < this.steps.length-1) {
-            container.find(".next").click(function () {
-                selfie.nextStep();
+            container.find(".next").on('keypress click', function (e) {
+                if(e.which === 13 || e.type === 'click') {
+                    selfie.handleAfterHook(currentStepEl);
+                    selfie.nextStep();
+                }
             });
         } else {
             container.find(".next").text("Done");
-            container.find(".next").click(function () {
-                $(".explain-container").remove();
+            container.find(".next").on('keypress click', function (e) {
+                if(e.which === 13 || e.type === 'click') {
+                    selfie.handleAfterHook(currentStepEl);
+                    $(".explain-container").remove();
+                }
             });
+        }
+    }
+
+    this.handleBeforeHook = function(currentStepEl) {
+        var beforeHook = currentStepEl.data("beforeHook");
+        if(beforeHook) {
+            eval(beforeHook);
+        }
+    }
+
+    this.handleAfterHook = function(currentStepEl) {
+        var afterHook = currentStepEl.data("afterHook");
+        if(afterHook) {
+            eval(afterHook);
         }
     }
 

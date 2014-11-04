@@ -19,7 +19,9 @@
     <script src='scripts/lib/jquery.joyride-2.1.js'></script>
 
     <script src="scripts/extensions.js"></script>
+    <script src="scripts/keyboard.js"></script>
     <script src="scripts/storage.js"></script>
+    <script src="scripts/demo-storage.js"></script>
     <script src="scripts/model.js"></script>
     <script src="scripts/view.js"></script>
     <script src="scripts/lib/explain.js"></script>
@@ -61,26 +63,46 @@
     </div>
 </div>
 <div class="new-note-popup" style="display: none">
-    <div>New Note</div>
+    <div class="heading">New Note</div>
     <i class="icon-cancel close"></i>
     <textarea class="content"></textarea>
     <input type="text" class="tag" placeholder="Tag"/>
     <input type="text" class="date" placeholder="dd/mm/yyyy"/>
     <button class="save">Save</button>
 </div>
+
+<div class="floating-login" style="display: none">
+    <button class="login">Sign In with Dropbox</button>
+</div>
 <div class="shortcuts site">
     <span class="key">Ctrl + n</span> : New Note &nbsp;&nbsp;
     <span class="key">→</span> : Scroll 1 day advance &nbsp;&nbsp;
     <span class="key">←</span> : Scroll 1 day before &nbsp;&nbsp;
-    <span class="key">Shift + →</span> : Scroll 1 week advance &nbsp;&nbsp;
-    <span class="key">Shift + ←</span> : Scroll 1 week before
+    <span class="key">Ctrl + →</span> : Scroll 1 week advance &nbsp;&nbsp;
+    <span class="key">Ctrl + ←</span> : Scroll 1 week before
 </div>
 <script src="scripts/init.js"></script>
 
 <!-- Tour -->
 <ol id="intro" style="display:none">
-    <li data-selector=".banner">This is the awesome banner at your disposal</li>
-    <li data-selector=".shortcuts" data-position="top">Find here your awesome shortcuts</li>
+    <li data-selector=".today">
+        Scrollable 'Timeline Bar' that highlights the current day in green and weekends in blue
+    </li>
+    <li data-selector=".note" data-position="top">
+        Every entry in your daybook is represented by a dot like this with details and option to delete it
+    </li>
+    <li data-selector=".new-note-popup .heading" data-position="top" data-before-hook="time_slider_view.showNewNotePopup()">
+        Popup to enter new notes along with a tag and a date
+    </li>
+    <li data-selector=".note-type text" data-before-hook="time_slider_view.closePopup()">
+        All your DayBook entries will be organized by the tags to analyze and understand your activity patterns easily
+    </li>
+    <li data-selector=".shortcuts" data-position="top">
+        Here are the shortcuts for your reference
+    </li>
+    <li data-selector=".floating-login" data-position="top" data-after-hook="time_slider_view.enableKeyboardShortcuts()">
+        Once you are ready, Connect to your dropbox account to store all your notes securely (They are stored in Dropbox repository that is only accessible to you)
+    </li>
 </ol>
 <script>
 

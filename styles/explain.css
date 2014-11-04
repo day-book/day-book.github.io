@@ -1,1 +1,47 @@
-.explain-container{position:absolute;opacity:0.8;margin-left:-14px}.explain-container .top-nub{width:0;height:0;border-bottom:14px solid #000000;border-left:14px solid transparent;border-right:14px solid transparent}.explain-container .content{position:relative;background-color:#000000;color:#FFFFFF;min-width:200px;min-height:100px;padding:5px}.explain-container .bottom-nub{display:none;width:0;height:0;border-top:14px solid #000000;border-left:14px solid transparent;border-right:14px solid transparent}.explain-container .next{position:absolute;bottom:5px;right:5px;width:30px;height:13px;background-color:blue;color:white;border-radius:3px;font-size:14px;padding:4px;line-height:12px;cursor:pointer}
+.explain-container {
+  position: absolute;
+  opacity: 0.8;
+  margin-left: -14px; }
+  .explain-container:before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(232, 232, 232, 0.6); }
+  .explain-container .top-nub {
+    width: 0;
+    height: 0;
+    border-bottom: 14px solid #000000;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent; }
+  .explain-container .content {
+    position: relative;
+    width: 400px;
+    background-color: #000000;
+    color: #FFFFFF;
+    min-width: 200px;
+    min-height: 100px;
+    padding: 5px; }
+  .explain-container .bottom-nub {
+    display: none;
+    width: 0;
+    height: 0;
+    border-top: 14px solid #000000;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent; }
+  .explain-container .next {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 35px;
+    height: 13px;
+    background-color: blue;
+    color: white;
+    border-radius: 3px;
+    font-size: 16px;
+    padding: 8px;
+    line-height: 12px;
+    cursor: pointer;
+    border: 1px solid #ffffff; }
