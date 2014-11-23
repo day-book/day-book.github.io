@@ -192,7 +192,13 @@ textarea, input {
   bottom: 20px;
   width: 100%;
   text-align: center;
-  color: #8d8d8d; }
+  color: #000000; }
+  .shortcuts .shortcut {
+    margin-right: 10px; }
   .shortcuts .key {
     font-weight: bold;
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 0 4px;
+    background-color: #d3d3d3;
     color: #000000; }
