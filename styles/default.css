@@ -70,14 +70,6 @@ textarea, input {
   padding: 5px;
   width: 400px;
   height: 200px; }
-  .note-popup:before {
-    content: '\e801';
-    top: -23px;
-    position: absolute;
-    left: 191.5px;
-    font-size: 32px;
-    font-family: fontello;
-    color: #EBEBEB; }
   .note-popup .content {
     background-color: transparent;
     border: none;
@@ -96,6 +88,24 @@ textarea, input {
       right: 4px;
       cursor: pointer;
       padding: 6px 10px; }
+
+.up-carat:before {
+  content: '\e801';
+  top: -23px;
+  position: absolute;
+  left: 191.5px;
+  font-size: 32px;
+  font-family: fontello;
+  color: #EBEBEB; }
+
+.down-carat:before {
+  content: '\e802';
+  top: 200px;
+  position: absolute;
+  left: 191.5px;
+  font-size: 32px;
+  font-family: fontello;
+  color: #EBEBEB; }
 
 .new-note-popup {
   background-color: #EBEBEB;
@@ -135,7 +145,7 @@ textarea, input {
 .close {
   position: absolute;
   top: 2px;
-  right: 6px;
+  right: 2px;
   cursor: pointer;
   font-size: 18px; }
 
