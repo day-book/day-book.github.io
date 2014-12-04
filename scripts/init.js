@@ -1,1 +1,1 @@
-var svg=$("#container"),time_slider_model=new Notes,time_slider_view=new TimeSliderView({el:svg,model:time_slider_model});
+var svg=$("#container"),time_slider_model=new Notes,time_slider_view=new TimeSliderView({el:svg,model:time_slider_model});vex.defaultOptions.className="vex-theme-top";
