@@ -49,11 +49,14 @@ textarea, input {
   stroke: #EDEDED;
   opacity: 0.65; }
 .tick-month text {
-  font-size: 15px;
+  font-size: 14px;
   fill: #000000; }
 
 .note-type rect {
   fill: #f2f2f2; }
+.note-type text {
+  font-size: 14px;
+  font-weight: bold; }
 
 .note {
   cursor: pointer; }
