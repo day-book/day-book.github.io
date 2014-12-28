@@ -215,3 +215,9 @@ textarea, input {
     padding: 0 4px;
     background-color: #d3d3d3;
     color: #000000; }
+
+.ui-autocomplete li {
+  border: 1px solid #ebebeb;
+  background-color: #ffffff; }
+.ui-autocomplete .ui-state-focus {
+  background-color: #d3d3d3; }
