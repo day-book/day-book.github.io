@@ -45,7 +45,7 @@ textarea, input {
   font-size: 14px; }
 
 .tick-month rect {
-  fill: #FFFFFF;
+  fill: #EBEBEB;
   stroke: #EDEDED;
   opacity: 0.65; }
 .tick-month text {
@@ -73,22 +73,30 @@ textarea, input {
   padding: 5px;
   width: 400px;
   height: 200px; }
+  .note-popup .date {
+    float: left;
+    margin-bottom: 5px;
+    font-size: 13px; }
   .note-popup .content {
     background-color: transparent;
     border: none;
+    border-top: 1px solid #E0E0E0;
+    padding-top: 5px;
     width: 97%;
     height: 77%;
     resize: none;
     overflow-y: visible; }
-  .note-popup .controls {
+  .note-popup .footer {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 98%;
     text-align: center; }
-    .note-popup .controls .delete {
+    .note-popup .footer .delete {
       border: 1px solid #FFFFFF;
       border-radius: 4px;
       color: #FFFFFF;
-      position: absolute;
-      bottom: 4px;
-      right: 4px;
+      float: right;
       cursor: pointer;
       padding: 6px 10px; }
 
@@ -205,7 +213,8 @@ textarea, input {
   bottom: 20px;
   width: 100%;
   text-align: center;
-  color: #000000; }
+  color: #000000;
+  font-size: 12px; }
   .shortcuts .shortcut {
     margin-right: 10px; }
   .shortcuts .key {

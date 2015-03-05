@@ -69,15 +69,19 @@
 </div>
 <svg id="container" class="site">
 </svg>
-<div class="note-popup" style="display:none">
-    <i class="icon-cancel close"></i>
+<div class="note-popup popup" style="display:none">
+    <div class="header">
+        <i class="date"></i>
+        <i class="icon-cancel close"></i>
+    </div>
+
     <textarea disabled class="content"></textarea>
 
-    <div class="controls">
+    <div class="footer">
         <button class="delete">Delete</button>
     </div>
 </div>
-<div class="new-note-popup autocompl" style="display: none">
+<div class="new-note-popup popup autocompl" style="display: none">
     <div class="heading">New Note</div>
     <i class="icon-cancel close"></i>
     <textarea class="content"></textarea>
@@ -105,6 +109,12 @@
     <span class="shortcut">
         <span class="key">Shift</span> + <span class="key">←</span> : Scroll 1 week before
     </span>
+    <span class="shortcut">
+        <span class="key">Shift</span> + <span class="key">↑</span> : Zoom Out
+    </span>
+    <span class="shortcut">
+        <span class="key">Shift</span> + <span class="key">↓</span> : Zoom In
+    </span>
 </div>
 <script src="scripts/init.js"></script>
 
@@ -122,7 +132,13 @@
     <li data-selector=".note-type text" data-before-hook="time_slider_view.closePopup()">
         All your DayBook entries will be organized by the tags to analyze and understand your activity patterns easily
     </li>
-    <li data-selector=".shortcuts" data-position="top">
+    <li data-selector=".tick" data-before-hook="time_slider_view.zoomOut()">
+        Zoom out to see your notes across longer time frame of 6 months...
+    </li>
+    <li data-selector=".tick" data-before-hook="time_slider_view.zoomOut()">
+        ...even to the whole year
+    </li>
+    <li data-selector=".shortcuts" data-before-hook="time_slider_view.zoomIn();time_slider_view.zoomIn()" data-position="top">
         Here are the shortcuts for your reference
     </li>
     <li data-selector=".floating-login" data-position="top" data-after-hook="time_slider_view.enableKeyboardShortcuts()">
