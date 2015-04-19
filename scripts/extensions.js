@@ -1,1 +1,10 @@
-String.prototype.hashCode=function(){var t,r,h,e=0;if(0==this.length)return e;for(t=0,h=this.length;h>t;t++)r=this.charCodeAt(t),e=(e<<5)-e+r,e|=0;return e};
+String.prototype.hashCode = function() {
+    var hash = 0, i, chr, len;
+    if (this.length == 0) return hash;
+    for (i = 0, len = this.length; i < len; i++) {
+        chr   = this.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};

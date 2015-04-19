@@ -1,1 +1,402 @@
-TimeSliderView=Backbone.View.extend({initialize:function(){this.d3el=d3.select(this.el),this.timeScale=d3.time.scale(),this.keyboard=new Keyboard,this.login=_.bind(this.login,this),this.demo=_.bind(this.demo,this),this.handleDelete=_.bind(this.handleDelete,this),this.handleMarkerDelete=_.bind(this.handleMarkerDelete,this),this.handleAdd=_.bind(this.handleAdd,this),this.handleAddMarker=_.bind(this.handleAddMarker,this),this.refresh=_.bind(this.refresh,this),$(".note-popup .delete").on("click",this.handleDelete),$(".marker-popup .delete").on("click",this.handleMarkerDelete),$(".new-note-popup .save").on("click",this.handleAdd),$(".new-marker-popup .save").on("click",this.handleAddMarker),$(".close").on("click",this.closePopup),$(".login").on("click",this.login),$(".demo").on("click",this.demo),this.listenTo(this.model,"change:scope",this.refresh),this.listenTo(this.model,"change:events",this.refresh),this.listenTo(this.model,"change:markers",this.refresh),this.listenTo(this.model,"change:username",this.setUserName),GlobalEvent.listenTo("refresh",this.refresh),this.createGroupContainers(),this.registerGlobalListeners(),this.showIntro();var e=this;this.d3el.on("click",function(){e.hideAllOpenPopups()})},createGroupContainers:function(){this.d3el.append("g").classed("mouse-pointer",!0),this.d3el.append("g").classed("month-ticks",!0),this.d3el.append("g").classed("day-ticks",!0),this.d3el.append("g").classed("notes",!0),this.d3el.append("g").classed("markers",!0)},registerGlobalListeners:function(){var e=this;this.d3el.on("mousemove",function(){var t=[{x:d3.event.x,y:d3.event.y}],n=e.d3el.select(".mouse-pointer").selectAll(".pointer").data(t);n.enter().append("rect").classed("pointer",!0),n.exit().remove(),n.attr("x",function(t){var n=moment(e.timeScale.invert(t.x));return NoteVM.x({date:n})}).attr("y",0).attr("width",1).attr("height",EnvironmentVM.availableHeight())})},showIntro:function(){$(".open-banner").show(),$(".site").hide()},login:function(){$(".open-banner").hide(),$(".floating-login").hide(),$(".site").show(),this.model.connect(!0),this.enableKeyboardShortcuts()},demo:function(){$(".open-banner").hide(),$(".floating-login").show(),$(".site").show(),this.model.connect(!1),$("#intro").explain(),this.keyboard.unbindAll()},enableKeyboardShortcuts:function(){this.keyboard.bindAll()},slideTimeline:function(e){this.hideAllOpenPopups(),this.model.adjustDatesInScope(e),this.refresh()},refresh:function(){console.log("Refreshing..."),EnvironmentVM.setBounds(this.$el.width(),this.$el.height()),EnvironmentVM.setDaysScale(this.model.getDateRangeInScope()),EnvironmentVM.setNoteTypesScale(this.model.getNoteTypes()),EnvironmentVM.setZoomLevel(this.model.get("zoomLevel")),this.setUserName(),this.drawTimeline(),this.drawNotes(),$(".popup-caret").remove(),this.drawMarkers()},setUserName:function(){$(".banner .username").html(this.model.get("username"))},drawTimeline:function(){this.timeScale=d3.time.scale().domain(this.model.getDateRangeInScope()).range([0,this.$el.width()+10]);var e=this.model.get("zoomLevel"),t=this.model.getDateTicksInScope(),n=this.d3el.select(".day-ticks").selectAll(".tick").data(t),a=n.enter().append("g").classed("tick",!0);a.append("rect"),a.append("text"),n.exit().remove(),n.select("rect").attr("x",TimelineVM.Day.x).attr("y",TimelineVM.Day.y).attr("width",TimelineVM.Day.width).attr("height",TimelineVM.Day.height).classed("sunday",function(t){return 1==e&&7==moment(t).isoWeekday()}).classed("today",function(t){return 1==e&&moment(t).format()==moment().startOf("day").format()}),n.select("text").attr("x",TimelineVM.DayText.x).attr("y",TimelineVM.DayText.y).style("font-size",TimelineVM.DayText.fontSize).text(TimelineVM.DayText.text);var o=this.d3el.select(".month-ticks").selectAll(".tick-month").data(this.model.getMonthsInScope()),i=o.enter().append("g").classed("tick-month",!0);i.append("rect"),i.append("text"),o.exit().remove(),o.select("rect").attr("x",TimelineVM.Month.x).attr("y",TimelineVM.Month.y).attr("width",TimelineVM.Month.width).attr("height",TimelineVM.Month.height),o.select("text").attr("x",TimelineVM.MonthText.x).attr("y",TimelineVM.MonthText.y).text(TimelineVM.MonthText.text)},drawNotes:function(e){var e=e||this.model.getNotesInScope(),t=this,n=this.d3el.select(".notes"),a=n.selectAll(".region").data([1]);a.enter().append("rect").classed("region",!0),a.attr("x",NotesVM.Region.x).attr("y",NotesVM.Region.y).attr("width",NotesVM.Region.width).attr("height",NotesVM.Region.height).call(d3.behavior.drag().on("dragstart",function(){t.dragStartPosition=d3.event.sourceEvent.x}).on("drag",function(){var e=moment(t.timeScale.invert(t.dragStartPosition)),n=moment(t.timeScale.invert(d3.event.x)),a=e.diff(n,"days");a+=n.isAfter(e)?-1:1,t.dragStartPosition=d3.event.x,t.slideTimeline(a)}));var o=n.selectAll(".note-type").data(e),i=o.enter().append("g").classed("note-type",!0);i.append("rect").classed("lane",!0),i.append("text"),o.exit().remove(),o.select(".lane").attr("x",NoteLaneVM.lane.x).attr("y",NoteLaneVM.lane.y).attr("width",NoteLaneVM.lane.width).attr("height",NoteLaneVM.lane.height),o.select("text").attr("x",NoteLaneVM.label.x).attr("y",NoteLaneVM.label.y).style("fill",NoteLaneVM.label.color).text(NoteLaneVM.label.text);var r=o.selectAll(".note").data(function(e){return e[1]});r.enter().append("circle").classed("note",!0),r.exit().remove(),r.attr("cx",NoteVM.x).attr("cy",NoteVM.y).attr("r",NoteVM.r).style("fill",NoteVM.color).on("click",function(){d3.event.stopPropagation(),t.showNotesPopup(t,this)})},moveNoteType:function(e){{var t=e.data().label;EnvironmentVM.noteTypeScale(t)}},findCollidingNoteType:function(e,t){var n=_.find($(".note-type"),function(n){var a=n.getBBox();return n!=e&&t>=a.y&&t<=a.y+a.height});return d3.select(n)},drawMarkers:function(){var e=this,t=(d3.scale.category10(),this.model.getMarkersInScope()),n=this.d3el.select(".markers").selectAll(".marker").data(t),a=n.enter().append("g").classed("marker",!0);a.append("rect"),a.append("path"),a.append("text"),n.exit().remove(),n.classed("collapsed",!0).attr("transform",MarkerVM.transform),n.select("rect").attr("x",MarkerVM.x).attr("width",MarkerVM.width).attr("y",MarkerVM.y).attr("height",MarkerVM.height).style("fill",MarkerVM.color),n.select("path").attr("transform",MarkerVM.Tag.transform).style("fill",MarkerVM.color).transition().attr("d",MarkerVM.Tag.path),n.select("text").attr("x",MarkerVM.Label.x).attr("y",MarkerVM.Label.y).attr("transform",MarkerVM.Tag.transform).text(MarkerVM.Label.initial),n.on("click",function(t){e.expandMarker(t,e,this)})},expandMarker:function(e,t,n){var n=d3.select(n);n.classed("collapsed",!1),n.select("text").text(MarkerVM.Label.text(e)),n.append("text").classed("del",!0).attr("x",MarkerVM.Delete.x).attr("y",MarkerVM.Delete.y).attr("transform",MarkerVM.Tag.transform).text(MarkerVM.Delete.text).on("click",function(e){t.model.deleteMarker(e)}),n.select("path").transition().attr("d",MarkerVM.Tag.expandedPath)},showNotesPopup:function(e,t){this.hideAllOpenPopups();var n=d3.select(t),a=n.data(),o=d3.select(document.body).selectAll(".note-popup").data(a);o.style("left",NoteVM.Popup.x).style("top",NoteVM.Popup.y).style("width",function(e){return NoteVM.Popup.width(e)+"px"}).style("height",NoteVM.Popup.height).style("display","block"),o.select(".date").text(function(e){return moment(e.date).format("DD MMM YYYY (dddd)")}),o.select(".content").text(function(e){return e.content}),o.select(".delete").style("background-color",NoteVM.color),$(".note-popup").data(a[0]);var i=this.d3el.selectAll(".popup-caret").data(a);i.enter().append("polygon").classed("popup-caret",!0),i.attr("points",NoteVM.Popup.Caret.points).attr("transform",NoteVM.Popup.Caret.transform)},closePopup:function(){var e=$(".close").closest(".popup");e.hide(),$(".popup-caret").remove()},hideAllOpenPopups:function(){$(".popup").hide(),$(".popup-caret").remove()},handleDelete:function(e){var t=$(e.target).closest(".note-popup"),n=t.data();this.model.deleteNote(n),t.hide(),$(".popup-caret").remove(),this.drawNotes()},handleMarkerDelete:function(e){var t=$(e.target).closest(".marker-popup"),n=t.data();this.model.deleteMarker(n),t.hide(),this.drawMarkers()},showNewNotePopup:function(){this.hideAllOpenPopups(),$(".popup-caret").remove(),$(".new-note-popup").show(),$(".new-note-popup input.tag").val(""),$(".new-note-popup input.date").val(moment().format("DD/MM/YYYY")),$(".new-note-popup textarea").focus(),$(".new-note-popup textarea").val(""),$(".new-note-popup .tag").autocomplete({source:this.model.getNoteTypes()})},handleAdd:function(){var e=$(".new-note-popup .content"),t=$(".new-note-popup .tag"),n=$(".new-note-popup .date"),a=new moment(n.val(),"DD/MM/YYYY",!0),o=[];_.isEmpty(e.val())&&o.push(e),_.isEmpty(t.val())&&o.push(t),a.isValid()||o.push(n),_.isEmpty(o)?(this.model.addNote(e.val(),t.val(),a),$(".new-note-popup").hide(),this.drawNotes()):($(".new-note-popup *").removeClass("invalid"),_.each(o,function(e){e.addClass("invalid")}))},zoomIn:function(){this.model.zoom(!0)},zoomOut:function(){this.model.zoom(!1)},showNewMarkerPopup:function(){this.hideAllOpenPopups();var e=$(".new-marker-popup");e.find("input").val(""),e.show()},handleAddMarker:function(){$(".new-marker-popup").hide();var e=$(".new-marker-popup .label"),t=$(".new-marker-popup .date"),n=new moment(t.val(),"DD/MM/YYYY",!0);this.model.addMarker(e.val(),n.toDate()),this.drawMarkers()}});
+TimeSliderView = Backbone.View.extend({
+    initialize: function () {
+        this.d3el = d3.select(this.el);
+        this.timeScale = d3.time.scale();
+        this.keyboard = new Keyboard();
+        this.login = _.bind(this.login, this);
+        this.demo = _.bind(this.demo, this);
+        this.handleDelete = _.bind(this.handleDelete, this);
+        this.handleMarkerDelete = _.bind(this.handleMarkerDelete, this);
+        this.handleAdd = _.bind(this.handleAdd, this);
+        this.handleAddMarker = _.bind(this.handleAddMarker, this);
+        this.refresh = _.bind(this.refresh, this);
+
+        $(".note-popup .delete").on("click", this.handleDelete);
+        $(".marker-popup .delete").on("click", this.handleMarkerDelete);
+        $(".new-note-popup .save").on("click", this.handleAdd);
+        $(".new-marker-popup .save").on("click", this.handleAddMarker);
+        $(".close").on("click", this.closePopup);
+        $(".login").on("click", this.login);
+        $(".demo").on("click", this.demo);
+
+        this.listenTo(this.model, "change:scope", this.refresh);
+        this.listenTo(this.model, "change:events", this.refresh);
+        this.listenTo(this.model, "change:markers", this.refresh);
+        this.listenTo(this.model, "change:username", this.setUserName);
+        GlobalEvent.listenTo("refresh", this.refresh);
+
+        this.createGroupContainers();
+        this.registerGlobalListeners();
+        this.showIntro();
+
+        var self = this;
+        this.d3el.on("click", function() {
+            self.hideAllOpenPopups();
+        });
+    },
+
+    createGroupContainers: function () {
+        //Rendering order of the groups is controlled by the position in the DOM
+        this.d3el.append("g").classed("mouse-pointer", true);
+        this.d3el.append("g").classed("month-ticks", true);
+        this.d3el.append("g").classed("day-ticks", true);
+        this.d3el.append("g").classed("notes", true);
+        this.d3el.append("g").classed("markers", true);
+    },
+
+    registerGlobalListeners: function () {
+        var that = this;
+
+        this.d3el.on("mousemove", function () {
+            var data = [
+                {x: d3.event.x, y: d3.event.y}
+            ];
+            var pointer = that.d3el.select(".mouse-pointer").selectAll(".pointer").data(data);
+            pointer.enter().append("rect").classed("pointer", true);
+            pointer.exit().remove();
+            pointer
+                .attr("x", function (d) {
+                    var date = moment(that.timeScale.invert(d.x));
+                    return NoteVM.x({date: date});
+                }).attr("y", 0)
+                .attr("width", 1)
+                .attr("height", EnvironmentVM.availableHeight());
+        })
+    },
+
+    showIntro: function () {
+        $(".open-banner").show();
+        $(".site").hide();
+    },
+
+    login: function () {
+        $(".open-banner").hide();
+        $(".floating-login").hide();
+        $(".site").show();
+        this.model.connect(true);
+        this.enableKeyboardShortcuts();
+    },
+
+    demo: function () {
+        $(".open-banner").hide();
+        $(".floating-login").show();
+        $(".site").show();
+        this.model.connect(false);
+        $("#intro").explain();
+        this.keyboard.unbindAll();
+    },
+
+    enableKeyboardShortcuts: function () {
+        this.keyboard.bindAll();
+    },
+
+    slideTimeline: function (days) {
+        this.hideAllOpenPopups();
+        this.model.adjustDatesInScope(days);
+        this.refresh();
+    },
+
+    refresh: function () {
+        console.log("Refreshing...");
+        EnvironmentVM.setBounds(this.$el.width(), this.$el.height());
+        EnvironmentVM.setDaysScale(this.model.getDateRangeInScope());
+        EnvironmentVM.setNoteTypesScale(this.model.getNoteTypes());
+        EnvironmentVM.setZoomLevel(this.model.get("zoomLevel"));
+        this.setUserName();
+        this.drawTimeline();
+        this.drawNotes();
+        $(".popup-caret").remove();
+        this.drawMarkers();
+    },
+
+    setUserName: function () {
+        $(".banner .username").html(this.model.get("username"));
+    },
+
+    drawTimeline: function () {
+        var that = this;
+        this.timeScale = d3.time.scale()
+            .domain(this.model.getDateRangeInScope()).range([0, this.$el.width() + 10]);
+
+        var currentZoomLevel = this.model.get("zoomLevel");
+        var ticksInScope = this.model.getDateTicksInScope();
+        var ticks = this.d3el.select(".day-ticks").selectAll(".tick")
+            .data(ticksInScope);
+        var newTicks = ticks.enter().append("g").classed("tick", true);
+        newTicks.append("rect");
+        newTicks.append("text");
+        ticks.exit().remove();
+        ticks.select("rect")
+            .attr("x", TimelineVM.Day.x)
+            .attr("y", TimelineVM.Day.y)
+            .attr("width", TimelineVM.Day.width)
+            .attr("height", TimelineVM.Day.height)
+            .classed("sunday", function (d) {
+                return currentZoomLevel == 1 && moment(d).isoWeekday() == 7
+            })
+            .classed("today", function (d) {
+                return currentZoomLevel == 1 && moment(d).format() == moment().startOf("day").format()
+            });
+        ticks.select("text")
+            .attr("x", TimelineVM.DayText.x)
+            .attr("y", TimelineVM.DayText.y)
+            .style("font-size", TimelineVM.DayText.fontSize)
+            .text(TimelineVM.DayText.text);
+
+        var monthTicks = this.d3el.select(".month-ticks").selectAll(".tick-month")
+            .data(this.model.getMonthsInScope());
+        var newMonthTicks = monthTicks.enter().append("g").classed("tick-month", true);
+        newMonthTicks.append("rect");
+        newMonthTicks.append("text");
+        monthTicks.exit().remove();
+        monthTicks.select("rect")
+            .attr("x", TimelineVM.Month.x)
+            .attr("y", TimelineVM.Month.y)
+            .attr("width", TimelineVM.Month.width)
+            .attr("height", TimelineVM.Month.height);
+        monthTicks.select("text")
+            .attr("x", TimelineVM.MonthText.x)
+            .attr("y", TimelineVM.MonthText.y)
+            .text(TimelineVM.MonthText.text);
+    },
+
+    drawNotes: function (notesModel) {
+        var notesModel = notesModel || this.model.getNotesInScope();
+        var that = this;
+        var notesElement = this.d3el.select(".notes");
+        var regions = notesElement.selectAll(".region").data([1]);
+        regions.enter().append("rect").classed("region", true);
+        regions.attr("x", NotesVM.Region.x)
+            .attr("y", NotesVM.Region.y)
+            .attr("width", NotesVM.Region.width)
+            .attr("height", NotesVM.Region.height)
+            .call(d3.behavior.drag()
+                .on("dragstart", function () {
+                    that.dragStartPosition = d3.event.sourceEvent.x;
+                })
+                .on("drag", function () {
+                    var dragStartDate = moment(that.timeScale.invert(that.dragStartPosition));
+                    var dragDate = moment(that.timeScale.invert(d3.event.x));
+                    var daysDifference = dragStartDate.diff(dragDate, 'days');
+                    daysDifference += dragDate.isAfter(dragStartDate) ? -1 : 1;
+                    that.dragStartPosition = d3.event.x;
+                    that.slideTimeline(daysDifference);
+                })
+        );
+
+        var noteTypes = notesElement.selectAll(".note-type").data(notesModel);
+        var newNoteTypes = noteTypes.enter().append("g").classed("note-type", true);
+        newNoteTypes.append("rect").classed("lane", true);
+        newNoteTypes.append("text");
+        noteTypes.exit().remove();
+        noteTypes.select(".lane")
+            .attr("x", NoteLaneVM.lane.x)
+            .attr("y", NoteLaneVM.lane.y)
+            .attr("width", NoteLaneVM.lane.width)
+            .attr("height", NoteLaneVM.lane.height);
+        noteTypes.select("text")
+            .attr("x", NoteLaneVM.label.x)
+            .attr("y", NoteLaneVM.label.y)
+            .style("fill", NoteLaneVM.label.color)
+            .text(NoteLaneVM.label.text);
+
+        var notes = noteTypes.selectAll(".note").data(function (d) {
+            return d[1];
+        });
+        notes.enter().append("circle").classed("note", true);
+        notes.exit().remove();
+        notes.attr("cx", NoteVM.x)
+            .attr("cy", NoteVM.y)
+            .attr("r", NoteVM.r)
+            .style("fill", NoteVM.color)
+            .on("click", function () {
+                d3.event.stopPropagation();
+                that.showNotesPopup(that, this)
+            });
+    },
+
+    moveNoteType: function(noteTypeElement, below) {
+        var noteTypeLabel = noteTypeElement.data().label;
+        var newY = EnvironmentVM.noteTypeScale(noteTypeLabel);
+
+    },
+
+    findCollidingNoteType: function(currentElement, currentElementPos) {
+        var collidingNoteType = _.find($(".note-type"), function(e) {
+            var box = e.getBBox();
+            return (e != currentElement && currentElementPos >= box.y && currentElementPos <= (box.y + box.height));
+        });
+        return d3.select(collidingNoteType);
+    },
+
+    drawMarkers: function () {
+        var that = this;
+        var color = d3.scale.category10();
+        var markersData = this.model.getMarkersInScope();
+        var markerElements = this.d3el.select(".markers").selectAll(".marker").data(markersData);
+        var newMarkerElements = markerElements.enter().append("g").classed("marker", true);
+        newMarkerElements.append("rect");
+        newMarkerElements.append("path");
+        newMarkerElements.append("text");
+        markerElements.exit().remove();
+        markerElements
+            .classed("collapsed", true)
+            .attr("transform", MarkerVM.transform)
+        markerElements.select("rect")
+            .attr("x", MarkerVM.x)
+            .attr("width", MarkerVM.width)
+            .attr("y", MarkerVM.y)
+            .attr("height", MarkerVM.height)
+            .style("fill", MarkerVM.color);
+        markerElements.select("path")
+            .attr("transform", MarkerVM.Tag.transform)
+            .style("fill", MarkerVM.color)
+            .transition()
+            .attr("d", MarkerVM.Tag.path);
+        markerElements.select("text")
+            .attr("x", MarkerVM.Label.x)
+            .attr("y", MarkerVM.Label.y)
+            .attr("transform", MarkerVM.Tag.transform)
+            .text(MarkerVM.Label.initial);
+        markerElements.on("click", function (d) {
+            that.expandMarker(d, that, this);
+        });
+    },
+
+    expandMarker: function (d, view, element) {
+        var element = d3.select(element);
+        element.classed("collapsed", false);
+        element.select("text").text(MarkerVM.Label.text(d));
+        element.append("text")
+            .classed("del", true)
+            .attr("x", MarkerVM.Delete.x)
+            .attr("y", MarkerVM.Delete.y)
+            .attr("transform", MarkerVM.Tag.transform)
+            .text(MarkerVM.Delete.text)
+            .on("click", function (d) {
+                view.model.deleteMarker(d);
+            });
+        element.select("path")
+            .transition()
+            .attr("d", MarkerVM.Tag.expandedPath);
+    },
+
+    showNotesPopup: function (view, element) {
+        var that = this;
+        this.hideAllOpenPopups();
+        var noteCircle = d3.select(element);
+        var note = noteCircle.data();
+        var notesPopup = d3.select(document.body).selectAll(".note-popup").data(note);
+        notesPopup
+            .style("left", NoteVM.Popup.x)
+            .style("top", NoteVM.Popup.y)
+            .style("width", function (d) {
+                return NoteVM.Popup.width(d) + "px"
+            })
+            .style("height", NoteVM.Popup.height)
+            .style("display", "block");
+        notesPopup.select(".date").text(function (d) {
+            return moment(d.date).format("DD MMM YYYY (dddd)");
+        })
+        notesPopup.select(".content").text(function (d) {
+            return d.content
+        });
+        notesPopup.select(".delete").style("background-color", NoteVM.color)
+        $(".note-popup").data(note[0]); //Used when delete handle is called
+
+        var caret = this.d3el.selectAll(".popup-caret").data(note);
+        caret.enter().append("polygon").classed("popup-caret", true);
+        caret.attr("points", NoteVM.Popup.Caret.points)
+            .attr("transform", NoteVM.Popup.Caret.transform);
+
+    },
+
+    closePopup: function (e) {
+        var popup = $(".close").closest(".popup");
+        popup.hide();
+        $(".popup-caret").remove();
+    },
+
+    hideAllOpenPopups: function() {
+        $(".popup").hide();
+        $(".popup-caret").remove();
+    },
+
+    handleDelete: function (e) {
+        var notePopup = $(e.target).closest(".note-popup");
+        var noteData = notePopup.data();
+        this.model.deleteNote(noteData);
+        notePopup.hide();
+        $(".popup-caret").remove();
+        this.drawNotes();
+    },
+
+    handleMarkerDelete: function (e) {
+        var markerPopup = $(e.target).closest(".marker-popup");
+        var markerData = markerPopup.data();
+        this.model.deleteMarker(markerData);
+        markerPopup.hide();
+        this.drawMarkers();
+    },
+
+    showNewNotePopup: function () {
+        this.hideAllOpenPopups();
+        $(".popup-caret").remove();
+        $(".new-note-popup").show();
+        $(".new-note-popup input.tag").val("");
+        $(".new-note-popup input.date").val(moment().format("DD/MM/YYYY"));
+        $(".new-note-popup textarea").focus();
+        $(".new-note-popup textarea").val("");
+        $(".new-note-popup .tag").autocomplete({
+            source: this.model.getNoteTypes()
+        });
+    },
+
+    handleAdd: function (e) {
+        var content = $(".new-note-popup .content");
+        var tag = $(".new-note-popup .tag");
+        var date = $(".new-note-popup .date");
+        var dateVal = new moment(date.val(), "DD/MM/YYYY", true);
+
+        var invalidFields = [];
+        if (_.isEmpty(content.val())) invalidFields.push(content);
+        if (_.isEmpty(tag.val())) invalidFields.push(tag);
+        if (!dateVal.isValid()) invalidFields.push(date);
+
+        if (_.isEmpty(invalidFields)) {
+            this.model.addNote(content.val(), tag.val(), dateVal);
+            $(".new-note-popup").hide();
+            this.drawNotes();
+        } else {
+            $(".new-note-popup *").removeClass("invalid");
+            _.each(invalidFields, function (invalidField) {
+                invalidField.addClass('invalid')
+            });
+        }
+    },
+
+    zoomIn: function () {
+        this.model.zoom(true);
+    },
+
+    zoomOut: function () {
+        this.model.zoom(false);
+    },
+
+    showNewMarkerPopup: function () {
+        this.hideAllOpenPopups();
+        var newMarkerPopup = $(".new-marker-popup");
+        newMarkerPopup.find("input").val("");
+        newMarkerPopup.show();
+    },
+
+    handleAddMarker: function () {
+        $(".new-marker-popup").hide();
+        var label = $(".new-marker-popup .label");
+        var date = $(".new-marker-popup .date");
+        var dateVal = new moment(date.val(), "DD/MM/YYYY", true);
+        this.model.addMarker(label.val(), dateVal.toDate());
+        this.drawMarkers();
+    }
+
+});

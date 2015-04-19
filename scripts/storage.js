@@ -1,1 +1,130 @@
-function Storage(e){function t(){var e=d.storageClient.getDatastoreManager();e.openDefaultDatastore(function(e,t){e?vex.dialog.alert("Error opening default datastore: "+e.responseText):(d.datastore=t,n())})}function n(){r(),a()}function a(){var e=o("events");d.model.set("events",e)}function r(){var e=o("markers");d.model.set("markers",e)}function o(e,t){var n=d.datastore.getTable(e).query(t),a=[];return _.each(n,function(e){var t=e.getFields();t.id=e.getId(),a.push(t)}),a}function i(e,t){var n=d.datastore.getTable(e),a=n.insert(t);t.id=a.getId()}function s(e,t){var n=d.datastore.getTable(e),a=n.get(t.id);a.update(t)}function c(e,t){var n=d.datastore.getTable(e),a=n.get(t.id);a.deleteRecord()}var d=this;d.model=e,this.init=function(){d.storageClient=new Dropbox.Client({key:"1eg429deptchqw3"})},this.authenticate=function(){var e=this;d.storageClient.authenticate(function(n){n?vex.dialog.alert("Authentication error: "+n.responseText):(t(),e.fetchUserName())})},this.fetchUserName=function(){return d.storageClient.getAccountInfo(function(e,t){e?vex.dialog.alert("Authentication error: "+e.responseText):GlobalEvent.trigger("user-info-fetched",{name:t.name})})},this.createNote=function(e){var t=o("events",{type:e.type,date:moment(e.date).startOf("day").toDate()});if(1==t.length){var n=t[0].content;t[0].content=n+"\n\n"+e.content,s("events",t[0]),d.model.afterUpdateNote(t[0])}else i("events",e),d.model.afterCreateNote(e)},this.updateType=function(e,t){var n=d.datastore.getTable("events").query({type:e});_.each(n,function(e){e.set("type",t)})},this.deleteNote=function(e){c("events",{id:e.id}),d.model.afterDeleteNote(e)},this.createMarker=function(e){i("markers",e)},this.deleteMarker=function(e){c("markers",e)},this.init()}
+function Storage(model) {
+    var selfie = this;
+    selfie.model = model;
+
+    this.init = function () {
+        selfie.storageClient = new Dropbox.Client({key: "1eg429deptchqw3"});
+    };
+
+    this.authenticate = function () {
+        var that = this;
+        selfie.storageClient.authenticate(function (error) {
+            if (error) {
+                vex.dialog.alert('Authentication error: ' + error.responseText);
+            } else {
+                initDatastore();
+                //that.getUserName(callback);
+                that.fetchUserName();
+            }
+        });
+    };
+
+    this.fetchUserName = function() {
+        return selfie.storageClient.getAccountInfo(function(error, info) {
+            if(error) {
+                vex.dialog.alert('Authentication error: ' + error.responseText);
+            } else {
+                GlobalEvent.trigger("user-info-fetched", {name: info.name});
+            }
+        });
+    };
+
+    this.createNote = function (eventInfo) {
+        var existingEvent = fetch('events', {type: eventInfo.type, date: moment(eventInfo.date).startOf('day').toDate()});
+        if(existingEvent.length == 1) {
+            var existingContent = existingEvent[0].content;
+            existingEvent[0].content = existingContent + "\n\n" + eventInfo.content;
+            update('events', existingEvent[0]);
+            selfie.model.afterUpdateNote(existingEvent[0]);
+            //GlobalEvent.trigger("note-updated", existingEvent[0]);
+        } else {
+            insert('events', eventInfo);
+            selfie.model.afterCreateNote(eventInfo);
+            //GlobalEvent.trigger("note-created", eventInfo);
+        }
+    };
+
+    this.updateType = function(oldType, newType) {
+        //var events = fetch('events', {type: oldType});
+        var events = selfie.datastore.getTable('events').query({type: oldType});
+        _.each(events, function(event) {
+            event.set('type', newType);
+        });
+
+    };
+
+    this.deleteNote = function (event, events) {
+        remove('events', {id: event.id});
+        selfie.model.afterDeleteNote(event);
+    };
+
+    this.createMarker = function(markerInfo) {
+        insert("markers", markerInfo);
+    };
+
+    this.deleteMarker = function(markerInfo, markers) {
+        remove("markers", markerInfo);
+    };
+
+    function initDatastore() {
+        var dataStoreManager = selfie.storageClient.getDatastoreManager();
+        dataStoreManager.openDefaultDatastore(function(error, datastore) {
+            if(error) {
+                vex.dialog.alert('Error opening default datastore: ' + error.responseText);
+            } else {
+                selfie.datastore = datastore;
+                loadData();
+            }
+        })
+    }
+
+    function loadData() {
+        loadMarkers();
+        loadEvents();
+    }
+
+    function loadEvents() {
+        var events = fetch("events");
+        selfie.model.set("events", events);
+    }
+
+    function loadMarkers() {
+        var markers = fetch("markers");
+        selfie.model.set("markers", markers);
+    }
+
+    function fetch(tableName, query) {
+        var records = selfie.datastore.getTable(tableName).query(query);
+        var recordsAsMap = [];
+        _.each(records, function(record) {
+            var recordMap = record.getFields();
+            recordMap.id = record.getId();
+            recordsAsMap.push(recordMap);
+        });
+        return recordsAsMap;
+    }
+
+    function insert(tableName, data) {
+        var table = selfie.datastore.getTable(tableName);
+        var record = table.insert(data);
+        data.id = record.getId();
+    }
+
+    function update(tableName, data) {
+        var table = selfie.datastore.getTable(tableName);
+        var record = table.get(data.id);
+        record.update(data);
+    }
+
+    function remove(tableName, data) {
+        var table = selfie.datastore.getTable(tableName);
+        var record = table.get(data.id);
+        record.deleteRecord();
+    }
+
+    this.init();
+}
+
+
+
+
