@@ -22,6 +22,12 @@
     <script src='scripts/lib/vex.combined.min.js'></script>
     <script src='scripts/lib/jquery-ui.min.js'></script>
 
+    <script src="scripts/ui/environment-vm.js"></script>
+    <script src="scripts/ui/timeline-vm.js"></script>
+    <script src="scripts/ui/note-vm.js"></script>
+    <script src="scripts/ui/note-lane-vm.js"></script>
+    <script src="scripts/ui/marker-vm.js"></script>
+    <script src="scripts/global-event.js"></script>
     <script src="scripts/extensions.js"></script>
     <script src="scripts/keyboard.js"></script>
     <script src="scripts/storage.js"></script>
@@ -69,23 +75,30 @@
 </div>
 <svg id="container" class="site">
 </svg>
+
 <div class="note-popup popup" style="display:none">
     <div class="header">
         <i class="date"></i>
-        <i class="icon-cancel close"></i>
     </div>
 
     <textarea disabled class="content"></textarea>
 
     <div class="footer">
-        <button class="delete">Delete</button>
+        <button class="delete"><i class="icon-cancel"></i> Delete</button>
     </div>
 </div>
+
 <div class="new-note-popup popup autocompl" style="display: none">
     <div class="heading">New Note</div>
-    <i class="icon-cancel close"></i>
     <textarea class="content"></textarea>
     <input type="text" class="tag" placeholder="Tag"/>
+    <input type="text" class="date" placeholder="dd/mm/yyyy"/>
+    <button class="save">Save</button>
+</div>
+
+<div class="new-marker-popup popup" style="display: none">
+    <div class="heading">New Marker</div>
+    <input type="text" class="label" placeholder="label"/>
     <input type="text" class="date" placeholder="dd/mm/yyyy"/>
     <button class="save">Save</button>
 </div>
