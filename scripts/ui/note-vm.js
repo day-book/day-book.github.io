@@ -68,7 +68,7 @@ var NoteVM = new function () {
         };
 
         this.isOnTop = function (d) {
-            return (NoteVM.y(d) + headerOffset + height > EnvironmentVM.height);
+            return (NoteVM.y(d) + headerOffset + height > EnvironmentVM.availableHeight());
         };
 
         this.Caret = new function() {
