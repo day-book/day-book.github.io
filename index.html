@@ -8,6 +8,7 @@
     <link href="styles/default.css" rel="stylesheet"/>
     <link href="styles/explain.css" rel="stylesheet"/>
     <link href="styles/vex.css"  rel="stylesheet"/>
+    <link href="styles/spinner.css"  rel="stylesheet"/>
     <link href="styles/vex-theme-top.css"  rel="stylesheet"/>
     <link href="styles/jquery-ui.css"  rel="stylesheet"/>
 
@@ -31,10 +32,15 @@
     <script src="scripts/extensions.js"></script>
     <script src="scripts/keyboard.js"></script>
     <script src="scripts/storage.js"></script>
+    <script src="scripts/firebase-storage.js"></script>
     <script src="scripts/demo-storage.js"></script>
     <script src="scripts/model.js"></script>
     <script src="scripts/view.js"></script>
+    <script src="scripts/migrate.js"></script>
+
     <script src="scripts/lib/explain.js"></script>
+
+    <script src="https://cdn.firebase.com/js/client/2.2.7/firebase.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -62,10 +68,27 @@
 <div class="open-banner">
     <img src="images/logo.png"/>
     <div class="heading">DayBook (குறிப்பேடு)</div>
-    A personal diary to introspect
+    <div class="brief">
+        A note taking app to enable personal introspection and development.<br/>
+        Be it learning something new or tracking a recurrent activity, Your notes will be grouped and visualized over a timeline to get a better picture
+    </div>
     <div class="controls">
-        <button class="demo">Demo</button>
-        <button class="login">Sign In with Dropbox</button>
+        <div class="note">
+            <button class="demo">Demo</button>
+            &nbsp;&nbsp;
+            <button class="login google">Login In </button>
+            <br/><br/>
+            <button class="dropbox login google">Login In + Migrate existing DayBook data from Dropbox</button>
+            <br/>
+            <span>
+                ( DayBook has moved from Dropbox to Google because of
+                <a target="_blank" href="https://blogs.dropbox.com/developers/2015/04/deprecating-the-sync-and-datastore-apis/">this</a> )
+            </span>
+        </div>
+    </div>
+    <div class="spinner" style="display:none"></div>
+    <div class="creator">
+        By <a href="https://twitter.com/SudhakarRay" target="_blank">@SudhakarRay</a>
     </div>
 </div>
 
@@ -104,8 +127,12 @@
 </div>
 
 <div class="floating-login" style="display: none">
-    <button class="login">Sign In with Dropbox</button>
+    <button class="login google">Sign Up</button>
 </div>
+<div class="floating-migrate" style="display: none">
+    <button class="login">Migrate data from Dropbox</button>
+</div>
+
 <div class="shortcuts site">
     <span class="shortcut">
         <span class="key">Shift</span> + <span class="key">n</span> : New Note &nbsp;&nbsp;
@@ -136,14 +163,17 @@
     <li data-selector=".today">
         Scrollable 'Timeline Bar' that highlights the current day in green and weekends in blue
     </li>
-    <li data-selector=".note" data-position="top">
-        Every entry in your daybook is represented by a dot like this with details and option to delete it
+    <li data-selector="circle.note" data-position="top">
+        Every entry in your DayBook is represented by a dot like this with details and option to delete it
     </li>
     <li data-selector=".new-note-popup .heading" data-position="top" data-before-hook="time_slider_view.showNewNotePopup()">
         Popup to enter new notes along with a tag and a date
     </li>
-    <li data-selector=".note-type text" data-before-hook="time_slider_view.closePopup()">
+    <li data-selector=".note-type text" data-before-hook="time_slider_view.hideAllOpenPopups()">
         All your DayBook entries will be organized by the tags to analyze and understand your activity patterns easily
+    </li>
+    <li data-selector=".marker text">
+        Use markers to represent important information across the notes
     </li>
     <li data-selector=".tick" data-before-hook="time_slider_view.zoomOut()">
         Zoom out to see your notes across longer time frame of 6 months...
@@ -155,7 +185,7 @@
         Here are the shortcuts for your reference
     </li>
     <li data-selector=".floating-login" data-position="top" data-after-hook="time_slider_view.enableKeyboardShortcuts()">
-        Once you are ready, Connect to your dropbox account to store all your notes securely (They are stored in Dropbox repository that is only accessible to you)
+        Once you are ready, Connect using your gooogle account to store all your notes
     </li>
 </ol>
 <script>

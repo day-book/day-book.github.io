@@ -37,11 +37,11 @@
     right: 5px;
     width: 35px;
     height: 13px;
-    background-color: blue;
-    color: white;
+    background-color: #33eb83;
+    color: #000;
     border-radius: 3px;
     font-size: 16px;
     padding: 8px;
     line-height: 12px;
     cursor: pointer;
-    border: 1px solid #ffffff; }
+    border: 1px solid #000; }

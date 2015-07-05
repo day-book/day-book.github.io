@@ -11,7 +11,6 @@ $.fn.explain = function(method) {
         "<div class='nub bottom-nub'>&nbsp;</div>";
 
     this.init = function() {
-
         this.nextStep();
     }
 
