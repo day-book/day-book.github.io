@@ -44,7 +44,7 @@ var NoteVM = new function () {
 
     this.Popup = new function () {
 
-        var height = 150;
+        var height = 180;
         var headerOffset = 26;
 
         this.x = function (d) {

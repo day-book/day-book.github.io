@@ -1,1 +1,12 @@
-var GlobalEvent={listenTo:function(t,n){document.addEventListener(t,n)},trigger:function(t,n){var e=new CustomEvent(t,{detail:n});document.dispatchEvent(e)}};
+var GlobalEvent = {
+
+    listenTo: function(eventName, handler) {
+        document.addEventListener(eventName, handler);
+    },
+
+    trigger: function(eventName, data) {
+        var event = new CustomEvent(eventName, {detail: data});
+        document.dispatchEvent(event);
+    }
+
+}

@@ -82,14 +82,6 @@ textarea, input {
   fill: #D1D1D1;
   pointer-events: none; }
 
-.delete {
-  border: 1px solid #FFFFFF;
-  border-radius: 4px;
-  color: #FFFFFF;
-  float: right;
-  cursor: pointer;
-  padding: 6px 10px 6px 6px; }
-
 .note-popup, .marker-popup {
   position: absolute;
   border: 2px solid #EBEBEB;
@@ -101,20 +93,38 @@ textarea, input {
     float: left;
     margin-bottom: 5px;
     font-size: 13px; }
+  .note-popup .content:disabled, .marker-popup .content:disabled {
+    background-color: transparent; }
   .note-popup .content, .marker-popup .content {
-    background-color: transparent;
+    background-color: #FFFFFF;
     border: none;
     border-top: 1px solid #E0E0E0;
-    padding-top: 5px;
-    width: 97%;
-    height: 77%;
+    padding: 5px;
+    width: 100%;
+    height: 76%;
     resize: none;
-    overflow-y: visible; }
+    overflow-y: visible;
+    box-sizing: border-box; }
+  .note-popup .delete, .marker-popup .delete {
+    border-radius: 4px;
+    color: #FFFFFF;
+    float: left;
+    cursor: pointer;
+    padding: 6px 10px 6px 6px; }
+  .note-popup .btn, .marker-popup .btn {
+    font-size: 14px;
+    border-radius: 10px;
+    color: #FFFFFF;
+    padding: 1px;
+    cursor: pointer;
+    background-color: #EBEBEB; }
+  .note-popup .edit, .note-popup .update, .marker-popup .edit, .marker-popup .update {
+    float: right; }
   .note-popup .footer, .marker-popup .footer {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 98%;
+    bottom: 1px;
+    right: 3px;
+    width: 99%;
     text-align: center; }
 
 .popup-caret {
